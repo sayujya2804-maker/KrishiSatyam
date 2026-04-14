@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiMitra & Jaldhar System</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h1 id="app-title">कृषिमित्र & जलधार</h1>
+            </div>
+            <div class="header-actions">
+                <!-- Language Toggle (Moved from Settings) -->
+                <div class="lang-toggle-header">
+                    <button class="lang-btn-header active" data-lang="hi" onclick="changeLanguage('hi')">हिं</button>
+                    <button class="lang-btn-header" data-lang="en" onclick="changeLanguage('en')">EN</button>
+                </div>
+                <div class="time" id="current-time"></div>
+                <button class="icon-btn" id="notifications-btn" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notification-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-header">
+            <h3 id="notifications-title">सूचनाएं</h3>
+            <button class="icon-btn" onclick="clearNotifications()">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <!-- Notifications will be added dynamically -->
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">
+            <i class="fas fa-chart-pie"></i>
+            <span id="tab-overview">ओवरव्यू</span>
+        </button>
+        <button class="tab-btn" data-tab="krishimitra" onclick="switchTab('krishimitra')">
+            <i class="fas fa-seedling"></i>
+            <span id="tab-krishimitra">कृषिमित्र</span>
+        </button>
+        <button class="tab-btn" data-tab="jaldhar" onclick="switchTab('jaldhar')">
+            <i class="fas fa-water"></i>
+            <span id="tab-jaldhar">जलधार</span>
+        </button>
+        <button class="tab-btn" data-tab="camera" onclick="switchTab('camera')">
+            <i class="fas fa-camera"></i>
+            <span id="tab-camera">कैमरा</span>
+        </button>
+        <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">
+            <i class="fas fa-cog"></i>
+            <span id="tab-settings">सेटिंग्स</span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overview-tab">
+            <div class="section">
+                <h2 class="section-title" id="overview-title">
+                    <i class="fas fa-chart-pie"></i> <span>सिस्टम ओवरव्यू</span>
+                </h2>
+                
+                <div class="overview-grid">
+                    <!-- Soil Moisture Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon soil">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-soil-title">मृदा नमी</h3>
+                            <div class="overview-values">
+                                <div class="overview-value">
+                                    <span class="label" id="overview-sensor1">सेंसर 1:</span>
+                                    <span class="value"><span id="overview-soil1">45</span>%</span>
+                                </div>
+                                <div class="overview-value">
+                                    <span class="label" id="overview-sensor2">सेंसर 2:</span>
+                                    <span class="value"><span id="overview-soil2">52</span>%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon temp">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-temp-title">तापमान</h3>
+                            <div class="overview-values">
+                                <div class="overview-value">
+                                    <span class="label" id="overview-temp1">स्थान 1:</span>
+                                    <span class="value"><span id="overview-temp1-val">28</span>°C</span>
+                                </div>
+                                <div class="overview-value">
+                                    <span class="label" id="overview-temp2">स्थान 2:</span>
+                                    <span class="value"><span id="overview-temp2-val">27</span>°C</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Humidity Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon humidity">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-humidity-title">आर्द्रता</h3>
+                            <div class="overview-values">
+                                <div class="overview-value">
+                                    <span class="label" id="overview-hum1">स्थान 1:</span>
+                                    <span class="value"><span id="overview-humidity1-val">65</span>%</span>
+                                </div>
+                                <div class="overview-value">
+                                    <span class="label" id="overview-hum2">स्थान 2:</span>
+                                    <span class="value"><span id="overview-humidity2-val">68</span>%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Level Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon water">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-water-title">जल स्तर</h3>
+                            <div class="overview-single">
+                                <div class="big-value"><span id="overview-water-val">75</span>%</div>
+                                <div class="mini-bar">
+                                    <div class="mini-bar-fill" id="overview-water-bar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- pH Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon ph">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-ph-title">pH स्तर</h3>
+                            <div class="overview-single">
+                                <div class="big-value"><span id="overview-ph-val">7.2</span> pH</div>
+                                <div class="status-badge good" id="overview-ph-status">सामान्य</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Air Quality Summary -->
+                    <div class="overview-card">
+                        <div class="overview-icon air">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="overview-content">
+                            <h3 id="overview-air-title">वायु गुणवत्ता</h3>
+                            <div class="overview-single">
+                                <div class="big-value"><span id="overview-air-val">85</span> PPM</div>
+                                <div class="status-badge good" id="overview-air-status">अच्छा</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KrishiMitra Tab -->
+        <div class="tab-content" id="krishimitra-tab">
+            <div class="section">
+                <h2 class="section-title" id="soil-moisture-title">
+                    <i class="fas fa-tint"></i> मृदा नमी
+                </h2>
+                <div class="card-grid">
+                    <div class="sensor-card">
+                        <div class="card-icon soil">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="sensor1-label">सेंसर 1</h3>
+                            <div class="sensor-value">
+                                <span id="soil1-value">45</span>
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="soil1-progress" style="width: 45%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sensor-card">
+                        <div class="card-icon soil">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="sensor2-label">सेंसर 2</h3>
+                            <div class="sensor-value">
+                                <span id="soil2-value">52</span>
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="soil2-progress" style="width: 52%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="temp-humidity-title">
+                    <i class="fas fa-thermometer-half"></i> तापमान और आर्द्रता
+                </h2>
+                <div class="card-grid">
+                    <div class="sensor-card">
+                        <div class="card-icon temp">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="temp1-label">तापमान 1</h3>
+                            <div class="sensor-value">
+                                <span id="temp1-value">28</span>
+                                <span class="unit">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sensor-card">
+                        <div class="card-icon humidity">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="humidity1-label">आर्द्रता 1</h3>
+                            <div class="sensor-value">
+                                <span id="humidity1-value">65</span>
+                                <span class="unit">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sensor-card">
+                        <div class="card-icon temp">
+                            <i class="fas fa-thermometer-half"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="temp2-label">तापमान 2</h3>
+                            <div class="sensor-value">
+                                <span id="temp2-value">27</span>
+                                <span class="unit">°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sensor-card">
+                        <div class="card-icon humidity">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="humidity2-label">आर्द्रता 2</h3>
+                            <div class="sensor-value">
+                                <span id="humidity2-value">68</span>
+                                <span class="unit">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="air-quality-title">
+                    <i class="fas fa-wind"></i> वायु गुणवत्ता
+                </h2>
+                <div class="card-grid">
+                    <div class="sensor-card wide">
+                        <div class="card-icon air">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>MQ-135</h3>
+                            <div class="sensor-value">
+                                <span id="air-quality-value">85</span>
+                                <span class="unit">PPM</span>
+                            </div>
+                            <div class="air-quality-status" id="air-quality-status">अच्छा</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="pump-control-title">
+                    <i class="fas fa-gear"></i> पंप नियंत्रण
+                </h2>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="pump-status">
+                            <div class="status-indicator" id="pump-indicator"></div>
+                            <span id="pump-status-text">बंद</span>
+                        </div>
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" id="auto-mode-btn" onclick="setPumpMode('auto')">
+                                <span id="auto-mode-text">ऑटो</span>
+                            </button>
+                            <button class="mode-btn" id="manual-mode-btn" onclick="setPumpMode('manual')">
+                                <span id="manual-mode-text">मैन्युअल</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pump-control" id="manual-controls" style="display: none;">
+                        <button class="pump-btn on" onclick="togglePump(true)">
+                            <i class="fas fa-power-off"></i>
+                            <span id="pump-on-text">पंप चालू करें</span>
+                        </button>
+                        <button class="pump-btn off" onclick="togglePump(false)">
+                            <i class="fas fa-stop"></i>
+                            <span id="pump-off-text">पंप बंद करें</span>
+                        </button>
+                    </div>
+                    <div class="auto-info" id="auto-info">
+                        <i class="fas fa-info-circle"></i>
+                        <p id="auto-info-text">ऑटो मोड में, पंप मृदा नमी के आधार पर स्वचालित रूप से चालू/बंद होगा</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="charts-title">
+                    <i class="fas fa-chart-line"></i> रीयल-टाइम डेटा
+                </h2>
+                <div class="chart-container">
+                    <canvas id="soilChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="tempHumidityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jaldhar Tab -->
+        <div class="tab-content" id="jaldhar-tab">
+            <div class="section">
+                <h2 class="section-title" id="water-level-title">
+                    <i class="fas fa-water"></i> जल स्तर
+                </h2>
+                <div class="card-grid">
+                    <div class="sensor-card wide">
+                        <div class="tank-visual">
+                            <div class="tank">
+                                <div class="water-fill" id="water-fill"></div>
+                                <div class="water-percentage" id="water-percentage">0%</div>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sensor-value">
+                                <span id="water-level-value">75</span>
+                                <span class="unit">%</span>
+                            </div>
+                            <div class="water-info">
+                                <div class="info-item">
+                                    <span id="tank-height-label">टैंक की ऊंचाई:</span>
+                                    <strong>20 cm</strong>
+                                </div>
+                                <div class="info-item">
+                                    <span id="current-level-label">वर्तमान स्तर:</span>
+                                    <strong><span id="current-water-height">15</span> cm</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="ph-level-title">
+                    <i class="fas fa-flask"></i> pH स्तर
+                </h2>
+                <div class="card-grid">
+                    <div class="sensor-card wide">
+                        <div class="card-icon ph">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="card-content">
+                            <div class="sensor-value">
+                                <span id="ph-value">7.2</span>
+                                <span class="unit">pH</span>
+                            </div>
+                            <div class="ph-scale">
+                                <div class="ph-indicator" id="ph-indicator"></div>
+                                <div class="ph-labels">
+                                    <span>0</span>
+                                    <span>7</span>
+                                    <span>14</span>
+                                </div>
+                            </div>
+                            <div class="ph-status" id="ph-status">सामान्य</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="water-chart-title">
+                    <i class="fas fa-chart-line"></i> जल निगरानी ग्राफ
+                </h2>
+                <div class="chart-container">
+                    <canvas id="waterLevelChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="phChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera Tab -->
+        <div class="tab-content" id="camera-tab">
+            <div class="section">
+                <h2 class="section-title" id="live-feed-title">
+                    <i class="fas fa-camera"></i> लाइव कैमरा फीड
+                </h2>
+                <div class="camera-container">
+                    <div class="camera-controls">
+                        <button class="icon-btn" onclick="refreshCamera()" id="refresh-btn">
+                            <i class="fas fa-sync"></i>
+                            <span id="refresh-text">रीफ्रेश</span>
+                        </button>
+                        <button class="icon-btn" onclick="toggleFullscreen()" id="fullscreen-btn">
+                            <i class="fas fa-expand"></i>
+                            <span id="fullscreen-text">फुलस्क्रीन</span>
+                        </button>
+                    </div>
+                    <div class="camera-view" id="camera-view">
+                        <img id="camera-feed" src="http://192.168.1.100/cam-hi.jpg" alt="ESP32-CAM Feed" onerror="handleCameraError()">
+                        <div class="camera-overlay" id="camera-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p id="camera-error-text">कैमरा से कनेक्ट नहीं हो सका</p>
+                            <button class="btn-primary" onclick="refreshCamera()">
+                                <span id="retry-text">पुनः प्रयास करें</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="camera-info">
+                        <div class="info-item">
+                            <i class="fas fa-circle" id="camera-status-icon"></i>
+                            <span id="camera-status-text">डिस्कनेक्टेड</span>
+                        </div>
+                        <div class="info-item">
+                            <span id="last-update-label">अंतिम अपडेट:</span>
+                            <span id="last-update-time">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="section">
+                <h2 class="section-title" id="general-settings-title">
+                    <i class="fas fa-sliders-h"></i> सामान्य सेटिंग्स
+                </h2>
+                
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i class="fas fa-moon"></i>
+                            <span id="dark-mode-label">डार्क मोड</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i class="fas fa-bell"></i>
+                            <span id="notifications-label">सूचनाएं</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="notifications-toggle" checked onchange="toggleNotificationPreference()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <i class="fas fa-sync"></i>
+                            <span id="auto-refresh-label">ऑटो रीफ्रेश</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-refresh-toggle" checked onchange="toggleAutoRefresh()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="threshold-settings-title">
+                    <i class="fas fa-sliders-h"></i> थ्रेशोल्ड सेटिंग्स
+                </h2>
+                
+                <div class="settings-card">
+                    <div class="threshold-item">
+                        <label for="temp-threshold">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span id="temp-threshold-label">तापमान सीमा (°C)</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="temp-threshold" value="35" min="0" max="50" oninput="updateSliderValue('temp-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="temp-threshold-display">35</span>°C
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('temperature')">
+                                <span id="save-text-1">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="threshold-item">
+                        <label for="humidity-threshold">
+                            <i class="fas fa-droplet"></i>
+                            <span id="humidity-threshold-label">आर्द्रता सीमा (%)</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="humidity-threshold" value="80" min="0" max="100" oninput="updateSliderValue('humidity-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="humidity-threshold-display">80</span>%
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('humidity')">
+                                <span id="save-text-2">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="threshold-item">
+                        <label for="soil-threshold">
+                            <i class="fas fa-tint"></i>
+                            <span id="soil-threshold-label">न्यूनतम मृदा नमी (%)</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="soil-threshold" value="30" min="0" max="100" oninput="updateSliderValue('soil-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="soil-threshold-display">30</span>%
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('soil')">
+                                <span id="save-text-3">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="threshold-item">
+                        <label for="water-threshold">
+                            <i class="fas fa-water"></i>
+                            <span id="water-threshold-label">न्यूनतम जल स्तर (%)</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="water-threshold" value="20" min="0" max="100" oninput="updateSliderValue('water-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="water-threshold-display">20</span>%
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('water')">
+                                <span id="save-text-4">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="threshold-item">
+                        <label for="ph-min-threshold">
+                            <i class="fas fa-flask"></i>
+                            <span id="ph-min-threshold-label">न्यूनतम pH</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="ph-min-threshold" value="6.5" min="0" max="14" step="0.1" oninput="updateSliderValue('ph-min-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="ph-min-threshold-display">6.5</span>
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('phMin')">
+                                <span id="save-text-5">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="threshold-item">
+                        <label for="ph-max-threshold">
+                            <i class="fas fa-flask"></i>
+                            <span id="ph-max-threshold-label">अधिकतम pH</span>
+                        </label>
+                        <div class="slider-group">
+                            <input type="range" id="ph-max-threshold" value="8.5" min="0" max="14" step="0.1" oninput="updateSliderValue('ph-max-threshold', this.value)">
+                            <div class="slider-value">
+                                <span id="ph-max-threshold-display">8.5</span>
+                            </div>
+                            <button class="btn-secondary" onclick="saveThreshold('phMax')">
+                                <span id="save-text-6">सेव</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title" id="about-title">
+                    <i class="fas fa-info-circle"></i> जानकारी
+                </h2>
+                <div class="settings-card">
+                    <div class="about-content">
+                        <h3>KrishiMitra & Jaldhar System</h3>
+                        <p id="version-text">संस्करण: 1.0.0</p>
+                        <p id="about-description">
+                            स्मार्ट कृषि निगरानी और नियंत्रण प्रणाली। 
+                            Arduino R4 WiFi और विभिन्न सेंसरों के साथ एकीकृत।
+                        </p>
+                        <div class="about-features">
+                            <p><i class="fas fa-check"></i> <span id="feature1">रीयल-टाइम मॉनिटरिंग</span></p>
+                            <p><i class="fas fa-check"></i> <span id="feature2">स्वचालित पंप नियंत्रण</span></p>
+                            <p><i class="fas fa-check"></i> <span id="feature3">लाइव कैमरा फीड</span></p>
+                            <p><i class="fas fa-check"></i> <span id="feature4">स्मार्ट अलर्ट सिस्टम</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
